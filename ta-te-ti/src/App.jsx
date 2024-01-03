@@ -40,11 +40,7 @@ function App() {
     // guardar partida
     window.localStorage.setItem('board', JSON.stringify(newBoard))
     window.localStorage.setItem('turn', newTurn)
-    saveGameStorage(
-    {
-      board: newBoard, 
-      turn: newTurn
-    })
+    saveGameStorage({ board: newBoard, turn: newTurn} )
     //revisar si hay ganador
     const newWinner = checkWinnerFrom(newBoard)
     if(newWinner){
