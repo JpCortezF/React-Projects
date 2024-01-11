@@ -1,7 +1,9 @@
-import { useState } from 'react'
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useCallback } from 'react'
 import { Movies } from './components/movies'
 import { useMovies } from './hooks/useMovies'
 import { useSearch } from './hooks/useSearch'
+import debounce from 'just-debounce-it'
 import './App.css'
 
 
@@ -12,14 +14,23 @@ export function App() {
   const { movies, getMovies, loading } = useMovies({ search, sort})
   const [searched, setSearched] = useState(false)
 
+  const debouncedGetMovies = useCallback(
+    debounce(search => {
+      getMovies({ search })
+    }, 300)
+    , [getMovies])
+
   const handleSubmit = (event) => {
     event.preventDefault()
     setSearched(true)
-    getMovies()
+    getMovies( {search} )
   }
 
   const handleChange = (event) => {
-    updateSearch(event.target.value)
+    const newSearch = event.target.value
+    updateSearch(newSearch)
+    debouncedGetMovies(newSearch)
+    setSort(false)
     if (searched) {
       setSearched(false)
     }
@@ -41,7 +52,7 @@ export function App() {
              }}
              onChange={handleChange} value={search} name='search' placeholder='Harry Potter, Naruto...' />
             <button type='submit'>Search</button>
-            <input type='checkbox' onChange={handleSort} checked={sort}/>
+            {movies && <input type='checkbox' onChange={handleSort} checked={sort}/>}
           </form>
             {error && searched &&  <p style={{ color: 'white'}}>{error}</p>}
         </header>
